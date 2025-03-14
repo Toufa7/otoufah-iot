@@ -1,0 +1,192 @@
+image: alpine:latest
+
+variables:
+  TestServer: $TestServer
+  TestUser: $TestUser
+  SEM_VER: V0.0.0
+  MR_TITLE: ""
+  LATEST_MR_COMMIT_SHA: ""
+  LATEST_TAG_COMMIT_SHA: ""
+
+
+stages:
+  - Building
+  - CodeQuality
+  - DeployTest
+  - Version
+  - Release
+  
+
+.initSSHConnection:
+    script:
+    - 'command -v ssh-agent >/dev/null || (apk add --update openssh)'
+    - eval $(ssh-agent -s)
+    - echo "$PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    - ssh-keyscan $ENV >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - |-
+      if ! ssh $USERNAME@$ENV 'whoami' &>/dev/null; then
+        echo -e "\033[0;31mCannot access server Connection lost :(\033[0m"
+        exit 1
+      fi
+
+Compiling:
+  stage: Building
+  before_script:
+    - !reference [.initSSHConnection, script]
+  script:
+    - echo "export CI_SERVER_HOST=$CI_SERVER_HOST" > varfile
+    - echo "export CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH" >> varfile
+    - echo "export USERNAME_=$USERNAME_" >> varfile
+    - echo "export ACCESS_=$ACCESS_" >> varfile
+    - echo "export CI_PROJECT_URL=$CI_PROJECT_URL" >> varfile
+    - scp varfile $USERNAME@$ENV:/home/$USERNAME/VAR/$CI_PROJECT_ID && echo "Copy successful"
+    - ssh $USERNAME@$ENV 'bash script_name.sh'
+  allow_failure: false
+  when: manual
+
+Deploying:
+  stage: DeployTest
+  needs: []
+  before_script:
+    - !reference [.initSSHConnection, script]
+  script:
+    - ssh $USERNAME@$ENV "bash -c 'cd \"/home/devops/online\" && DATE=\`date +%Y%m%d%H%M%S\` && EXE=\`find . -type f -name \"*x1\"\` && mv \"\$EXE\" \"\${EXE%.x1}\$DATE.x1\" && EXE=\`find . -type f -name \"*x1\"\`&& scp \"\$EXE\" $TestUser@$TestServer:/home/$TestUser/MXMOExe'"
+  when: manual
+  allow_failure: true
+
+CodeQuality:
+  needs: []
+  image:
+    name: sonarsource/sonar-scanner-cli:5.0.1
+    entrypoint: [""]
+  stage: CodeQuality
+  variables:
+    SONAR_USER: "admin"
+    QUALITY_PROFILE: "CProject"
+    LANGUAGE: "cxx"
+    SONAR_URL: "http://172.18.37.25:9000"
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+      key: "${CI_JOB_NAME}"
+      paths:
+      - .sonar/cache
+  before_script:
+      - apk add --no-cache cppcheck
+      - apk add --update nodejs npm
+      - npm install -g sonar-report
+  script:
+      - git clone -b $CI_COMMIT_BRANCH http://${USERNAME_}:${ACCESS_}@$(echo "$CI_PROJECT_URL" | cut -d '/' -f 3-).git
+      - cd $CI_PROJECT_NAME
+      - cppcheck --xml --xml-version=2 --enable=all . 2> cppcheck-report.xml
+      - curl -X POST -u $SONAR_USER:$SONAR_PASSWORD "$SONAR_URL/api/projects/create"
+        -d "project=$CI_PROJECT_NAME"
+        -d "name=$CI_PROJECT_NAME"
+        -d "mainBranch=$CI_COMMIT_BRANCH"
+
+      - curl -X POST -u $SONAR_USER:$SONAR_PASSWORD "$SONAR_URL/api/qualityprofiles/add_project"
+        -d "project=$CI_PROJECT_NAME"
+        -d "language=$LANGUAGE"
+        -d "qualityProfile=$QUALITY_PROFILE"
+
+      - sonar-scanner -X 
+          -Dsonar.projectKey=$CI_PROJECT_NAME
+          -Dsonar.projectName=$CI_PROJECT_NAME
+          -Dsonar.host.url=$SONAR_URL
+          -Dsonar.inclusions=**/*.c,**/*.h 
+          -Dsonar.cxx.file.suffixes=.c,.h 
+          -Dsonar.token=$SONAR_TOKEN 
+          -Dsonar.cppcheck.reportPath=cppcheck-report.xml 
+          -Dsonar.language=cxx 
+          -Dsonar.qualitygate.wait=true
+
+      - sonar-report \
+          --sonarurl="$SONAR_URL" \
+          --sonartoken="sqa_4e35fb5f7b645c5278d9fa5f1e5612c8127e630e" \
+          --sonarcomponent="$CI_PROJECT_NAME" \
+          --project="$CI_PROJECT_NAME" \
+          --application="$CI_PROJECT_NAME" \
+          --sonarusername="$SONAR_USER" \
+          --sonarpassword="$SONAR_PASSWORD" \
+          --release="1.0.0" \
+          --branch="$CI_COMMIT_BRANCH" \
+          --output="sonar-report_sonar-report-$CI_PROJECT_NAME.html"
+
+  artifacts:
+    paths:
+      - ./sonar-report_sonar-report-$CI_PROJECT_NAME.html
+  when: manual
+
+Versioning:
+  stage: Version
+  before_script:
+    - apk add --no-cache curl jq git bash git-cliff
+    - git clone https://github.com/markchalloner/git-semver.git && git-semver/install.sh
+      #    - git fetch --prune --unshallow --tags origin 2>/dev/null
+      #- git remote set-url origin http://$USERNAME_:${GITLAB_CI_TOKEN}@${CI_SERVER_HOST}:8010/${CI_PROJECT_PATH}.git
+      #- git tag -l | xargs -r git tag -d 2>/dev/null
+      #- git fetch origin 'refs/tags/*:refs/tags/*' 2>/dev/null
+  script:
+    - echo "Fetching current semantic version..."
+    - SEM_VER=$(git semver get 2>/dev/null)
+    - echo "Current Tag => $SEM_VER"
+
+    - echo "Fetching Merge Request Title..."
+    - |-
+      MR_TITLE=$(curl -s --location "http://${CI_SERVER_HOST}:8010/api/v4/projects/$CI_PROJECT_ID/merge_requests" --header "PRIVATE-TOKEN: $GITLAB_CI_TOKEN" | jq -r '.[0].title')
+    - echo "Merge Request Title => $MR_TITLE"
+
+    - echo "Fetching commit SHAs..."
+    - LATEST_TAG_COMMIT=$(git rev-list -n 1 "$SEM_VER" 2>/dev/null || git rev-list -n 1 HEAD)
+    - |-
+      LATEST_MR_COMMIT=$(git rev-parse origin/master)
+    - echo "Latest Tag Commit => ${LATEST_TAG_COMMIT:0:8} | Latest MR Commit => ${LATEST_MR_COMMIT:0:8}"
+
+    - if [ "$LATEST_TAG_COMMIT" = "$LATEST_MR_COMMIT" ]; then
+        echo "No new changes since last tag. Skipping release.";
+        exit 0;
+      fi
+
+    - echo "Determining version bump type..."
+    - if [[ "$MR_TITLE" == *"PATCH"* ]]; then
+        SEM_VER=$(git semver patch --dryrun 2>/dev/null);
+      elif [[ "$MR_TITLE" == *"MINOR"* ]]; then
+        SEM_VER=$(git semver minor --dryrun 2>/dev/null);
+      elif [[ "$MR_TITLE" == *"MAJOR"* ]]; then
+        SEM_VER=$(git semver major --dryrun 2>/dev/null);
+      else
+        echo -e "\e[31mNo matching MR title found. No version bump will be made.\e[0m";
+        exit 0;
+      fi
+    - echo "Next Tag => $SEM_VER"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git tag -a "$SEM_VER" -m "Release $SEM_VER"
+    - git push origin "$SEM_VER"
+  only:
+      - master
+  allow_failure: false
+  when: manual
+
+Release:
+  stage: Release
+  before_script:
+    - apk add --no-cache curl jq git bash git-cliff
+    - git clone https://github.com/markchalloner/git-semver.git && git-semver/install.sh
+  script:
+      - SEM_VER=$(git semver get 2>/dev/null)
+      - |
+        CHANGELOG=$(git cliff --tag $SEM_VER)
+        echo "$CHANGELOG" > CHANGELOG.md
+        curl --header "PRIVATE-TOKEN: $GITLAB_CI_TOKEN" \
+            --data-urlencode "name=$CI_PROJECT_NAME $SEM_VER" \
+            --data-urlencode "tag_name=$SEM_VER" \
+            --data-urlencode "description=$CHANGELOG" \
+            --data-urlencode "ref=master" \
+            --request POST "http://${CI_SERVER_HOST}:8010/api/v4/projects/2486/releases"
+    # - git tag -a $SEM_VER -F CHANGELOG.md
+    # - git remote set-url origin http://$USERNAME_:${GITLAB_CI_TOKEN}@${CI_SERVER_HOST}:8010/${CI_PROJECT_PATH}.git
+    # - git push origin $SEM_VER
+  when: manual
