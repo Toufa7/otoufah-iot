@@ -102,7 +102,7 @@ spec:
           - containerPort: 8080      
         env:
         - name: MESSAGE
-          value: "Salam from app3"
+          value: "Salam from the default entry app3"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -128,7 +128,7 @@ spec:
           - containerPort: 8080
         env:
         - name: MESSAGE
-          value: "Argocd Salam from app2"
+          value: "Salam from app2"
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

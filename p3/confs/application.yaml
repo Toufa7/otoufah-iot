@@ -4,11 +4,11 @@ metadata:
   name: argocd-iot
 spec:
   destination:
-    namespace: ''
+    namespace: dev
     server: https://kubernetes.default.svc
   source:
     path: p2/
-    repoURL: git@gitlab.com:Toufa7/inception-of-things.git
+    repoURL: https://gitlab.com/Toufa7/inception-of-things.git # TODO: replace with github repo
     targetRevision: HEAD
   sources: []
   project: default
@@ -16,5 +16,3 @@ spec:
     automated:
       prune: false
       selfHeal: false
-
-# TODO: Since our repo is private i've tried to $k cp id_rsa -n argocd argocd-server-99c485944-m48sz:/home/argocd
