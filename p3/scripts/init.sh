@@ -17,7 +17,7 @@ k3d cluster create iot
 
 # Install Kubectl
 echo -e "\033[34m$(date +%T) [INFO] Installing kubectl\033[0m"
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl\033[0m"
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
 
 # Install Argo CD CLI
 echo -e "\033[34m$(date +%T) [INFO] Installing Argo CD\033[0m"
@@ -41,11 +41,12 @@ kubectl get secrets argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pa
 # Login to Argo CD
 echo -e "\033[34m$(date +%T) [INFO] Logging in to Argo CD\033[0m"
 argocd login localhost:8080 --insecure
+argocd repo add https://gitlab.com/Toufa7/inception-of-things.git
 argocd app create argocd-iota \
   --repo https://gitlab.com/Toufa7/inception-of-things.git\
   --path p2/ \
   --dest-server https://kubernetes.default.svc \
-  --dest-namespace default \
+  --dest-namespace dev \
   --project default \
   --directory-recurse \
   --sync-policy automated
