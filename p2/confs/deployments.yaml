@@ -22,7 +22,7 @@ spec:
           - containerPort: 8080        
         env:
         - name: MESSAGE
-          value: "Salam from app1"
+          value: "Salam Walikoum from app1"
 ---
 apiVersion: apps/v1
 kind: Deployment
