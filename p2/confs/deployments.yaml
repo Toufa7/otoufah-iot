@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app1
+  name: app1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: app1
+    spec:
+      containers:
+      - image: paulbouwer/hello-kubernetes:1.10
+        name: hello-app
+        ports:
+          - containerPort: 8080        
+        env:
+        - name: MESSAGE
+          value: "Salam from app1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app2
+  name: app2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: app2
+    spec:
+      containers:
+      - image: paulbouwer/hello-kubernetes:1.10
+        name: hello-app
+        ports:
+          - containerPort: 8080
+        env:
+        - name: MESSAGE
+          value: "Salam from app2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app3
+  name: app3
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: app3
+    spec:
+      containers:
+      - image: paulbouwer/hello-kubernetes:1.10
+        name: hello-app
+        ports:
+          - containerPort: 8080      
+        env:
+        - name: MESSAGE
+          value: "Salam from app3"

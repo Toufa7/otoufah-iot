@@ -9,7 +9,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 1
     end
     master.vm.provision "file", source: "./scripts/setupK3s.sh", destination: "/home/vagrant/setup.sh"
-    master.vm.provision "file", source: "./deployment.yaml", destination: "/home/vagrant/deployment.yaml"
+    master.vm.synced_folder "./confs", "/home/vagrant/confs"
     master.vm.provision "shell", inline: "chmod +x /home/vagrant/setup.sh && /home/vagrant/setup.sh"
 
   end
