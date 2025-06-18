@@ -16,7 +16,7 @@ spec:
         app: app1
     spec:
       containers:
-      - image: paulbouwer/hello-kubernetes:1.10
+      - image: paulbouwer/hello-kubernetes:1.5
         name: hello-app
         ports:
           - containerPort: 8080        
