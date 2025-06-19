@@ -16,13 +16,14 @@ spec:
         app: app1
     spec:
       containers:
-      - image: paulbouwer/hello-kubernetes:1.5
-        name: hello-app
+      - image: otoufah/iot:v1
+        command: ["npm", "start"]
+        name: app1
         ports:
           - containerPort: 8080        
         env:
         - name: MESSAGE
-          value: "Salam Walikoum from app1"
+          value: "Salam from app1"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -42,8 +43,9 @@ spec:
         app: app2
     spec:
       containers:
-      - image: paulbouwer/hello-kubernetes:1.10
-        name: hello-app
+      - image: otoufah/iot:v1
+        command: ["npm", "start"]
+        name: app2
         ports:
           - containerPort: 8080
         env:
@@ -68,8 +70,9 @@ spec:
         app: app3
     spec:
       containers:
-      - image: paulbouwer/hello-kubernetes:1.10
-        name: hello-app
+      - image: otoufah/iot:v1
+        command: ["npm", "start"]
+        name: app3
         ports:
           - containerPort: 8080      
         env:
