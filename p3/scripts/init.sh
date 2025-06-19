@@ -31,7 +31,7 @@ kubectl create namespace dev
 
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl wait deployment argocd-server -n argocd --for=condition=Available=True --timeout=30s
-nohup kubectl port-forward svc/argocd-server -n argocd 8443:443 > /dev/null 2>&1 &
+nohup kubectl port-forward svc/argocd-server -n argocd 8765:443 > /dev/null 2>&1 &
 
 # Argo CD Credentials
 echo -e "\033[34m$(date +%T) [INFO] Argo CD Credentials\033[0m"
@@ -39,7 +39,7 @@ kubectl get secrets argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pa
 
 # Login to Argo CD
 echo -e "\033[34m$(date +%T) [INFO] Logging in to Argo CD\033[0m"
-argocd login localhost:8443 --insecure
+argocd login 127.0.0.1:8765 --insecure
 argocd repo add https://gitlab.com/Toufa7/inception-of-things.git
 argocd app create argocd-iota \
   --repo https://gitlab.com/Toufa7/inception-of-things.git\

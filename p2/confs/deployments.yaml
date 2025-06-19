@@ -16,7 +16,7 @@ spec:
         app: app1
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app1
         ports:
@@ -43,7 +43,7 @@ spec:
         app: app2
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app2
         ports:
@@ -70,7 +70,7 @@ spec:
         app: app3
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app3
         ports:
