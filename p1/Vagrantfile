@@ -1,9 +1,9 @@
 Vagrant.configure("2") do |config|
   
   config.vm.define "ibnadaS" do |ibnadaS|
-    ibnadaS.vm.box = "ubuntu/bionic64"
+    ibnadaS.vm.box = "bento/ubuntu-24.04"
     ibnadaS.vm.hostname = "ibnadaS"
-    ibnadaS.vm.network "private_network", ip: "192.168.56.110", adapter: 2
+    ibnadaS.vm.network "private_network", ip: "192.168.56.110"
     ibnadaS.vm.provider "virtualbox" do |vb|
       vb.name = "ibnadaS"
       vb.memory = "1024"
@@ -29,9 +29,9 @@ Vagrant.configure("2") do |config|
   end
   
   config.vm.define "ibnadaSW" do |ibnadaSW|
-    ibnadaSW.vm.box = "ubuntu/bionic64"
+    ibnadaSW.vm.box = "bento/ubuntu-24.04"
     ibnadaSW.vm.hostname = "ibnadaSW"
-    ibnadaSW.vm.network "private_network", ip: "192.168.56.111", adapter: 2
+    ibnadaSW.vm.network "private_network", ip: "192.168.56.111"
     ibnadaSW.vm.provider "virtualbox" do |vb|
       vb.name = "ibnadaSW"
       vb.memory = "1024"
@@ -40,7 +40,7 @@ Vagrant.configure("2") do |config|
     
     ibnadaSW.vm.provision "shell", inline: <<-SHELL
       echo "Installing K3s in agent mode..."
-      curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$(cat /vagrant/node-token) INSTALL_K3S_EXEC="--node-ip=192.168.56.111" sh -
+      curl -sfL https://get.k3s.io | K3S_URL=https://192.168.56.110:6443 K3S_TOKEN=$(cat /vagrant/node-token) INSTALL_K3S_EXEC="--flannel-iface eth1" sh -
       
       # Set up kubectl for vagrant user (using server's config)
       mkdir -p /home/vagrant/.kube
