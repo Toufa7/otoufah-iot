@@ -43,7 +43,7 @@ argocd login localhost:8443 --insecure
 argocd repo add https://gitlab.com/Toufa7/inception-of-things.git
 argocd app create argocd-iota \
   --repo https://gitlab.com/Toufa7/inception-of-things.git\
-  --path p2/ \
+  --path p2/confs \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace dev \
   --project default \

@@ -3,7 +3,7 @@
 # Install k3s
 curl -sfL https://get.k3s.io | sh -
 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
-kubectl apply -f confs/
+kubectl apply -f /home/vagrant/confs
 
 # bash Auto completion for kubectl & vagrant
 sudo apt-get install -y bash-completion

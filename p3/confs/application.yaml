@@ -7,7 +7,7 @@ spec:
     namespace: dev
     server: https://kubernetes.default.svc
   source:
-    path: p2/
+    path: p2/confs
     repoURL: https://gitlab.com/Toufa7/inception-of-things.git # TODO: replace with github repo
     targetRevision: HEAD
   sources: []
