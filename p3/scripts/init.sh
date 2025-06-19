@@ -1,7 +1,5 @@
 #!/bin/bash
 
-## Init
-
 # Install Docker
 echo -e "\033[34m$(date +%T) [INFO] Installing Docker\033[0m\033[0m"
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
@@ -20,9 +18,9 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 
 # Install Argo CD CLI
 echo -e "\033[34m$(date +%T) [INFO] Installing Argo CD\033[0m"
-# curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
 sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
-# rm argocd-linux-amd64
+rm argocd-linux-amd64
 
 # Install Argo CD setup
 echo -e "\033[34m$(date +%T) [INFO] Argo CD Setup\033[0m"
