@@ -8,7 +8,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     path: p2/confs
-    repoURL: https://gitlab.com/Toufa7/inception-of-things.git # TODO: replace with github repo
+    repoURL: https://github.com/Toufa7/otoufah-iot.git
     targetRevision: HEAD
   sources: []
   project: default

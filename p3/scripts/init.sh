@@ -40,9 +40,9 @@ kubectl get secrets argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pa
 # Login to Argo CD
 echo -e "\033[34m$(date +%T) [INFO] Logging in to Argo CD\033[0m"
 argocd login 127.0.0.1:8765 --insecure
-argocd repo add https://gitlab.com/Toufa7/inception-of-things.git
+argocd repo add https://github.com/Toufa7/otoufah-iot.git
 argocd app create argocd-iota \
-  --repo https://gitlab.com/Toufa7/inception-of-things.git\
+  --repo https://github.com/Toufa7/otoufah-iot.git\
   --path p2/confs \
   --dest-server https://kubernetes.default.svc \
   --dest-namespace dev \
@@ -57,4 +57,4 @@ kubectl apply -f ../confs/application.yaml
 echo -e "\033[34m$(date +%T) [INFO] Setup complete\033[0m"
 
 # k exec -n argocd -it argocd-server-99c485944-m48sz -- /bin/bash
-# $ argocd repo add https://gitlab.com/Toufa7/inception-of-things.git --ssh-private-key-path  id_rsa
+# $ argocd repo add https://github.com/Toufa7/otoufah-iot.git --ssh-private-key-path  id_rsa
