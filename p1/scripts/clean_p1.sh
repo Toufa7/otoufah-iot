@@ -9,11 +9,11 @@ echo -e "${BLU}Cleaning script start ...${DEF}"
 
 echo -e "${RED}[1/3] Removing old kube config${DEF}"
 
-rm ./conf/kubeconfig
+rm ../conf/kubeconfig
 
 echo -e "${RED}[2/3] Removing old node token${DEF}"
 
-rm ./conf/node-token
+rm ../conf/node-token
 
 echo -e "${RED}[3/3] Removing vms${DEF}"
 
