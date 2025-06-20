@@ -16,7 +16,7 @@ spec:
         app: app1
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app1
         ports:
@@ -32,7 +32,7 @@ metadata:
     app: app2
   name: app2
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: app2
@@ -43,7 +43,7 @@ spec:
         app: app2
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app2
         ports:
@@ -59,7 +59,7 @@ metadata:
     app: app3
   name: app3
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: app3
@@ -70,7 +70,7 @@ spec:
         app: app3
     spec:
       containers:
-      - image: otoufah/iot:v2
+      - image: otoufah/iot:v1
         command: ["npm", "start"]
         name: app3
         ports:
