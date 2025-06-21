@@ -8,7 +8,6 @@ DEF='\e[0m'
 echo -e "${BLU}Init script start ...${DEF}"
 
 echo -e "${RED}[1/4] Creating confs folder${DEF}"
-mkdir ../confs
 
 echo -e "${RED}[2/4] Removing old kubeconfig and node token${DEF}"
 rm ../confs/kubeconfig ../confs/node-token
