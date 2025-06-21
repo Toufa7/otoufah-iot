@@ -14,9 +14,14 @@ k3d cluster create iot
 
 # Install Kubectl
 echo -e "\033[34m$(date +%T) [INFO] Installing kubectl\033[0m"
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-chmod +x ./kubectl
-sudo mv ./kubectl /usr/local/bin/kubectl
+if command -v kubectl >/dev/null 2>&1; then
+  echo "Kubectl already exists."
+else {
+  curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  chmod +x ./kubectl
+  sudo mv ./kubectl /usr/local/bin/kubectl
+}
+fi
 
 # Install Argo CD CLI
 echo -e "\033[34m$(date +%T) [INFO] Installing Argo CD\033[0m"
