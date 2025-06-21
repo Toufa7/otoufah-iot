@@ -16,14 +16,14 @@ spec:
         app: app1
     spec:
       containers:
-      - image: otoufah/iot:v1
+      - image: otoufah/iot:v2
         command: ["npm", "start"]
         name: app1
         ports:
           - containerPort: 8080        
         env:
         - name: MESSAGE
-          value: "Salam from app1"
+          value: "Bonjour from app1"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,14 +43,14 @@ spec:
         app: app2
     spec:
       containers:
-      - image: otoufah/iot:v1
+      - image: otoufah/iot:v2
         command: ["npm", "start"]
         name: app2
         ports:
           - containerPort: 8080
         env:
         - name: MESSAGE
-          value: "Salam from app2"
+          value: "Hola from app2"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -70,11 +70,11 @@ spec:
         app: app3
     spec:
       containers:
-      - image: otoufah/iot:v1
+      - image: otoufah/iot:v2
         command: ["npm", "start"]
         name: app3
         ports:
           - containerPort: 8080      
         env:
         - name: MESSAGE
-          value: "Salam from app3"
+          value: "SALAMAA from app3"
