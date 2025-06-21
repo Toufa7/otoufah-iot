@@ -6,7 +6,13 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 
 # Install K3D
 echo -e "\033[34m$(date +%T) [INFO] Installing k3d\033[0m"
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+if command -v k3d >/dev/null 2>&1; then
+  echo "Kubectl already exists."
+else {
+  curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+}
+fi
+
 
 # Creating cluster
 echo -e "\033[34m$(date +%T) [INFO] Creating k3d cluster\033[0m"
