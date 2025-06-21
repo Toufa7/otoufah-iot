@@ -26,6 +26,8 @@ Vagrant.configure("2") do |config|
     
     ibnadaSW.vm.provision "shell", path: "./scripts/install_worker.sh"
 
+    ibnadaSW.vm.provision "shell", inline: "sudo rm -rf ./vagrant/confs/node-token"
+
   end
   
 end
