@@ -15,6 +15,8 @@ k3d cluster create iot
 # Install Kubectl
 echo -e "\033[34m$(date +%T) [INFO] Installing kubectl\033[0m"
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x ./kubectl
+sudo mv ./kubectl /usr/local/bin/kubectl
 
 # Install Argo CD CLI
 echo -e "\033[34m$(date +%T) [INFO] Installing Argo CD\033[0m"
@@ -39,14 +41,14 @@ kubectl get secrets argocd-initial-admin-secret -n argocd -o jsonpath="{.data.pa
 echo -e "\033[34m$(date +%T) [INFO] Logging in to Argo CD\033[0m"
 argocd login 127.0.0.1:8765 --insecure
 argocd repo add https://github.com/Toufa7/otoufah-iot.git
-argocd app create argocd-iota \
-  --repo https://github.com/Toufa7/otoufah-iot.git\
-  --path p2/confs \
-  --dest-server https://kubernetes.default.svc \
-  --dest-namespace dev \
-  --project default \
-  --directory-recurse \
-  --sync-policy automated
+# argocd app create argocd-iota \
+#   --repo https://github.com/Toufa7/otoufah-iot.git\
+#   --path p2/confs \
+#   --dest-server https://kubernetes.default.svc \
+#   --dest-namespace dev \
+#   --project default \
+#   --directory-recurse \
+#   --sync-policy automated
 
 # Apply Kubernetes manifests
 echo -e "\033[34m$(date +%T) [INFO] Applying Kubernetes manifests\033[0m"
